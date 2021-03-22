@@ -92,6 +92,17 @@ REST_FRAMEWORK = {
 }
 
 
+# Django Mail Server definitions
+# https://docs.djangoproject.com/en/3.1/topics/email/
+
+EMAIL_HOST = config.mail['host']
+EMAIL_PORT = config.mail['port']
+EMAIL_HOST_USER = config.mail['user']
+EMAIL_HOST_PASSWORD = config.mail['password']
+EMAIL_USE_TLS = config.mail['tls']
+EMAIL_USE_SSL = config.mail['ssl']
+
+
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
