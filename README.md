@@ -4,6 +4,11 @@ Splice Technologies Auth is an authentication service built in Django using the 
 platform authentication and authorization.
 
 
+## Usage
+Using REST API as a means of communication STA (Splice Technologies Auth) service will authenticate and authorize your
+requests.
+
+
 ## Contributing
 Contributions are always welcome. However, please make sure to follow the contribution guidelines provided in the
 following [markdown file](https://github.com/Splice-Technologies/splice-docs/blob/master/CONTRIBUTE.md).

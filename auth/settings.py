@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Third Party Apps
+    'rest_framework',
+
     # Project Apps
     'users',
 ]
@@ -77,6 +80,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'auth.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
+
+
+# Django Rest Framework definitions
+# https://www.django-rest-framework.org/
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 
 # Database
