@@ -10,12 +10,12 @@ class UserService(object):
     def create_user(username: str, email: str, password: str) -> settings.AUTH_USER_MODEL:
         user = User.objects.create_user(username, email, password, is_active=False)
 
-        subject = 'Splice Technologies Auth User Confirmation'
-        message = f'http://127.0.0.1:8001/api/users/create/confirm/?confirmation_code={user.confirmation_code}'
-        from_email = 'noreply@localhost'
-        recipient_list = [user.email]
-
-        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        send_mail(
+            'Splice Technologies Auth User Confirmation',
+            f'http://127.0.0.1:8001/api/users/create/confirm/?confirmation_code={user.confirmation_code}',
+            'noreply@localhost',
+            [user.email],
+            fail_silently=False)
 
         return user
 

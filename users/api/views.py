@@ -30,3 +30,12 @@ class ConfirmUserView(APIView):
             confirmation = UserService.confirm_user(confirmation_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        confirm_user_serializer = ConfirmUserSerializer(data=request.data)
+
+        if confirm_user_serializer.is_valid(raise_exception=True):
+            confirmation_code = confirm_user_serializer.validated_data['confirmation_code']
+            confirmation = UserService.confirm_user(confirmation_code)
+
+            return Response(confirmation, status=status.HTTP_200_OK)
