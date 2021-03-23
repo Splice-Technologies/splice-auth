@@ -17,6 +17,7 @@ class User(AbstractUser):
     password_reset_expiration = models.DateTimeField(blank=True, null=True)
 
 
+# noinspection PyUnusedLocal
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def set_confirmation_code(sender, instance=None, created=False, **kwargs):
     if created:

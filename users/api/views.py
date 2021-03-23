@@ -58,8 +58,8 @@ class ConfirmPasswordResetView(APIView):
         confirm_password_reset_serializer = ConfirmPasswordResetSerializer(data=request.data)
 
         if confirm_password_reset_serializer.is_valid(raise_exception=True):
-            password = confirm_password_reset_serializer['password']
-            password_reset_code = confirm_password_reset_serializer['password_reset_code']
+            password = confirm_password_reset_serializer.validated_data['password']
+            password_reset_code = confirm_password_reset_serializer.validated_data['password_reset_code']
             confirmation = UserService.confirm_password_reset(password, password_reset_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)

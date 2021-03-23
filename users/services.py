@@ -4,8 +4,9 @@ import datetime
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+from django.utils import timezone
 
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied
 
 from .models import User
 
@@ -16,9 +17,9 @@ class UserService(object):
         user = User.objects.create_user(username, email, password, is_active=False)
 
         send_mail(
-            'Splice Technologies Auth User Confirmation',
+            'Splice Technologies// Auth - User Confirmation',
             f'http://127.0.0.1:8001/api/users/create/confirm/?confirmation_code={user.confirmation_code}',
-            'noreply@localhost',
+            'noreply@splice.com',
             [user.email],
             fail_silently=False)
 
@@ -43,9 +44,9 @@ class UserService(object):
         user.save()
 
         send_mail(
-            'Splice Technologies Auth Password Reset',
+            'Splice Technologies// Auth - Password Reset',
             f'{user.password_reset_code}',
-            'noreply@localhost',
+            'noreply@splice.com',
             [user.email],
             fail_silently=False)
 
@@ -53,8 +54,8 @@ class UserService(object):
     def confirm_password_reset(password: str, password_reset_code: str) -> bool:
         user = get_object_or_404(User, password_reset_code=password_reset_code)
 
-        if user.password_reset_expiration < datetime.datetime.now():
-            raise ValidationError({'message': 'Password reset code expired'})
+        if user.password_reset_expiration < timezone.now():
+            raise PermissionDenied()
 
         user.set_password(password)
         user.save()

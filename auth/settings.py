@@ -95,6 +95,8 @@ REST_FRAMEWORK = {
 # Django Mail Server definitions
 # https://docs.djangoproject.com/en/3.1/topics/email/
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = config.mail['host']
 EMAIL_PORT = config.mail['port']
 EMAIL_HOST_USER = config.mail['user']
