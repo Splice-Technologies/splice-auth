@@ -1,6 +1,11 @@
+import uuid
+import datetime
+
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
+
+from rest_framework.exceptions import ValidationError
 
 from .models import User
 
@@ -30,3 +35,28 @@ class UserService(object):
     @staticmethod
     def get_user_by_username(username: str) -> settings.AUTH_USER_MODEL:
         return get_object_or_404(User, username=username)
+
+    @staticmethod
+    def reset_password(user: User) -> None:
+        user.password_reset_code = uuid.uuid4().hex
+        user.password_reset_expiration = datetime.datetime.now() + datetime.timedelta(hours=1)
+        user.save()
+
+        send_mail(
+            'Splice Technologies Auth Password Reset',
+            f'{user.password_reset_code}',
+            'noreply@localhost',
+            [user.email],
+            fail_silently=False)
+
+    @staticmethod
+    def confirm_password_reset(password: str, password_reset_code: str) -> bool:
+        user = get_object_or_404(User, password_reset_code=password_reset_code)
+
+        if user.password_reset_expiration < datetime.datetime.now():
+            raise ValidationError({'message': 'Password reset code expired'})
+
+        user.set_password(password)
+        user.save()
+
+        return True

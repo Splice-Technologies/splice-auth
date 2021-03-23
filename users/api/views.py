@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import CreateUserSerializer, UserSerializer, ConfirmUserSerializer
+from .serializers import CreateUserSerializer, UserSerializer, ConfirmUserSerializer, ConfirmPasswordResetSerializer
 from ..services import UserService
 
 
@@ -37,5 +38,28 @@ class ConfirmUserView(APIView):
         if confirm_user_serializer.is_valid(raise_exception=True):
             confirmation_code = confirm_user_serializer.validated_data['confirmation_code']
             confirmation = UserService.confirm_user(confirmation_code)
+
+            return Response(confirmation, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        UserService.reset_password(request.user)
+
+        return Response({'message': 'Password reset code was sent to your email.'}, status=status.HTTP_200_OK)
+
+
+class ConfirmPasswordResetView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        confirm_password_reset_serializer = ConfirmPasswordResetSerializer(data=request.data)
+
+        if confirm_password_reset_serializer.is_valid(raise_exception=True):
+            password = confirm_password_reset_serializer['password']
+            password_reset_code = confirm_password_reset_serializer['password_reset_code']
+            confirmation = UserService.confirm_password_reset(password, password_reset_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)

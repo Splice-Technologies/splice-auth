@@ -13,6 +13,8 @@ class User(AbstractUser):
         verbose_name = 'User'
 
     confirmation_code = models.CharField(max_length=36, blank=False, null=False)
+    password_reset_code = models.CharField(max_length=36, blank=False, null=True)
+    password_reset_expiration = models.DateTimeField(blank=True, null=True)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
