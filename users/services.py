@@ -3,7 +3,6 @@ import datetime
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.core.mail import send_mail
 from django.utils import timezone
 
 from rest_framework.exceptions import PermissionDenied
@@ -15,12 +14,10 @@ class UserService(object):
     @staticmethod
     def create_user(username: str, email: str, password: str) -> settings.AUTH_USER_MODEL:
         user = User.objects.create_user(username, email, password, is_active=False)
-
-        send_mail(
+        user.email_user(
             'Splice Technologies// Auth - User Confirmation',
             f'http://127.0.0.1:8001/api/users/create/confirm/?confirmation_code={user.confirmation_code}',
             'noreply@splice.com',
-            [user.email],
             fail_silently=False)
 
         return user
@@ -42,12 +39,10 @@ class UserService(object):
         user.password_reset_code = uuid.uuid4().hex
         user.password_reset_expiration = datetime.datetime.now() + datetime.timedelta(hours=1)
         user.save()
-
-        send_mail(
+        user.email_user(
             'Splice Technologies// Auth - Password Reset',
             f'{user.password_reset_code}',
             'noreply@splice.com',
-            [user.email],
             fail_silently=False)
 
     @staticmethod
@@ -61,3 +56,12 @@ class UserService(object):
         user.save()
 
         return True
+    
+    @staticmethod
+    def update_user(user: User, username: str, first_name: str, last_name: str) -> settings.AUTH_USER_MODEL:
+        user.username = username
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        return user

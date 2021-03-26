@@ -25,3 +25,9 @@ class ConfirmPasswordResetSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['password', 'password_reset_code']
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name']
