@@ -1,4 +1,3 @@
-import uuid
 import datetime
 
 from django.conf import settings
@@ -7,7 +6,9 @@ from django.utils import timezone
 
 from rest_framework.exceptions import PermissionDenied
 
-from .models import User
+from .models import User, Email
+from .utils import UserUtils
+from .conf import UserConf
 
 
 class UserService(object):
@@ -16,7 +17,7 @@ class UserService(object):
         user = User.objects.create_user(username, email, password, is_active=False)
         user.email_user(
             'Splice Technologies// Auth - User Confirmation',
-            f'http://127.0.0.1:8001/api/users/create/confirm/?confirmation_code={user.confirmation_code}',
+            f'{user.confirmation_code}',
             'noreply@splice.com',
             fail_silently=False)
 
@@ -28,6 +29,10 @@ class UserService(object):
         user.is_active = True
         user.save()
 
+        email = Email.objects.get(email=user.email)
+        email.validated = True
+        email.save()
+
         return True
 
     @staticmethod
@@ -36,8 +41,11 @@ class UserService(object):
 
     @staticmethod
     def reset_password(user: User) -> None:
-        user.password_reset_code = uuid.uuid4().hex
-        user.password_reset_expiration = datetime.datetime.now() + datetime.timedelta(hours=1)
+        now = datetime.datetime.now()
+        expiration = datetime.timedelta(hours=UserConf.reset_code_expiration)
+
+        user.password_reset_code = UserUtils.generate_uuid4()
+        user.password_reset_expiration = now + expiration
         user.save()
         user.email_user(
             'Splice Technologies// Auth - Password Reset',
@@ -56,7 +64,7 @@ class UserService(object):
         user.save()
 
         return True
-    
+
     @staticmethod
     def update_user(user: User, username: str, first_name: str, last_name: str) -> settings.AUTH_USER_MODEL:
         user.username = username
@@ -65,3 +73,34 @@ class UserService(object):
         user.save()
 
         return user
+
+    @staticmethod
+    def reset_email(user: User) -> None:
+        now = datetime.datetime.now()
+        expiration = datetime.timedelta(hours=UserConf.reset_code_expiration)
+
+        user.email_reset_code = UserUtils.generate_uuid4()
+        user.email_reset_expiration = now + expiration
+        user.save()
+        user.email_user('Splice Technologies// Auth - Email Reset',
+                        f'{user.email_reset_code}',
+                        'noreply@splice.com',
+                        fail_silently=False)
+
+    @staticmethod
+    def confirm_email_reset(email: str, email_reset_code: str) -> bool:
+        user = get_object_or_404(User, email_reset_code=email_reset_code)
+
+        if user.email_reset_expiration < timezone.now():
+            raise PermissionDenied()
+
+        user.email = email
+        user.confirmation_code = UserUtils.generate_uuid4()
+        user.is_active = False
+        user.save()
+        user.email_user('Splice Technologies// Auth - User Confirmation',
+                        f'{user.confirmation_code}',
+                        'noreply@splice.com',
+                        fail_silently=False)
+
+        return True

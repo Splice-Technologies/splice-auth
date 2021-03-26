@@ -7,7 +7,8 @@ from .serializers import (CreateUserSerializer,
                           UserSerializer,
                           ConfirmUserSerializer,
                           ConfirmPasswordResetSerializer,
-                          UpdateUserSerializer, )
+                          UpdateUserSerializer,
+                          ConfirmEmailResetSerializer)
 from ..services import UserService
 
 
@@ -16,9 +17,9 @@ class CreateUserView(APIView):
         serializer = CreateUserSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            username = serializer.validated_data['username']
-            password = serializer.validated_data['password']
-            email = serializer.validated_data['email']
+            username = serializer.validated_data.get('username')
+            password = serializer.validated_data.get('password')
+            email = serializer.validated_data.get('email')
 
             user = UserService.create_user(username, email, password)
             user_serializer = UserSerializer(instance=user)
@@ -27,20 +28,11 @@ class CreateUserView(APIView):
 
 
 class ConfirmUserView(APIView):
-    def get(self, request):
-        serializer = ConfirmUserSerializer(data=request.query_params)
-
-        if serializer.is_valid(raise_exception=True):
-            confirmation_code = serializer.validated_data['confirmation_code']
-            confirmation = UserService.confirm_user(confirmation_code)
-
-            return Response(confirmation, status=status.HTTP_200_OK)
-
     def post(self, request):
         serializer = ConfirmUserSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            confirmation_code = serializer.validated_data['confirmation_code']
+            confirmation_code = serializer.validated_data.get('confirmation_code')
             confirmation = UserService.confirm_user(confirmation_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)
@@ -62,8 +54,8 @@ class ConfirmPasswordResetView(APIView):
         serializer = ConfirmPasswordResetSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
-            password = serializer.validated_data['password']
-            password_reset_code = serializer.validated_data['password_reset_code']
+            password = serializer.validated_data.get('password')
+            password_reset_code = serializer.validated_data.get('password_reset_code')
             confirmation = UserService.confirm_password_reset(password, password_reset_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)
@@ -84,3 +76,27 @@ class UpdateUserView(APIView):
             user_serializer = UserSerializer(instance=user)
 
             return Response(user_serializer.data, status=status.HTTP_200_OK)
+
+
+class ResetEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        UserService.reset_email(request.user)
+
+        return Response({'message': 'Email reset code was sent to your email.'}, status=status.HTTP_200_OK)
+
+
+class ConfirmEmailResetView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = ConfirmEmailResetSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.validated_data.get('email')
+            email_reset_code = serializer.validated_data.get('email_reset_code')
+            confirmation = UserService.confirm_email_reset(email, email_reset_code)
+
+            return Response({'success': confirmation, 'message': 'User confirmation code was sent to your email'},
+                            status=status.HTTP_200_OK)
