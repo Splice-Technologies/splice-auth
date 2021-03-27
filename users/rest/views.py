@@ -56,7 +56,7 @@ class ConfirmPasswordResetView(APIView):
         if serializer.is_valid(raise_exception=True):
             password = serializer.validated_data.get('password')
             password_reset_code = serializer.validated_data.get('password_reset_code')
-            confirmation = UserService.confirm_password_reset(password, password_reset_code)
+            confirmation = UserService.confirm_password_reset(request.user, password, password_reset_code)
 
             return Response(confirmation, status=status.HTTP_200_OK)
 

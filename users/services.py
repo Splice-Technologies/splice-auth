@@ -73,8 +73,11 @@ class UserService(object):
         email.send(fail_silently=False)
 
     @staticmethod
-    def confirm_password_reset(password: str, password_reset_code: str) -> bool:
+    def confirm_password_reset(request_user: User, password: str, password_reset_code: str) -> bool:
         user = get_object_or_404(User, password_reset_code=password_reset_code)
+
+        if request_user != user:
+            raise PermissionDenied()
 
         if user.password_reset_expiration < timezone.now():
             raise PermissionDenied()
