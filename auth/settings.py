@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+import datetime
 
-from auth import config
+from auth import conf
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -91,18 +92,22 @@ REST_FRAMEWORK = {
     )
 }
 
+ACCESS_TOKEN_LIFETIME = datetime.timedelta(hours=1)
+
+REFRESH_TOKEN_LIFETIME = datetime.timedelta(hours=2)
+
 
 # Django Mail Server definitions
 # https://docs.djangoproject.com/en/3.1/topics/email/
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = config.mail['host']
-EMAIL_PORT = config.mail['port']
-EMAIL_HOST_USER = config.mail['user']
-EMAIL_HOST_PASSWORD = config.mail['password']
-EMAIL_USE_TLS = config.mail['tls']
-EMAIL_USE_SSL = config.mail['ssl']
+EMAIL_HOST = conf.mail['host']
+EMAIL_PORT = conf.mail['port']
+EMAIL_HOST_USER = conf.mail['user']
+EMAIL_HOST_PASSWORD = conf.mail['password']
+EMAIL_USE_TLS = conf.mail['tls']
+EMAIL_USE_SSL = conf.mail['ssl']
 
 
 # Database
@@ -111,11 +116,11 @@ EMAIL_USE_SSL = config.mail['ssl']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': config.database['name'],
-        'USER': config.database['user'],
-        'PASSWORD': config.database['password'],
-        'HOST': config.database['host'],
-        'PORT': config.database['port'],
+        'NAME': conf.database['name'],
+        'USER': conf.database['user'],
+        'PASSWORD': conf.database['password'],
+        'HOST': conf.database['host'],
+        'PORT': conf.database['port'],
     }
 }
 

@@ -1,7 +1,7 @@
 from django.test import TestCase, RequestFactory
 
 from .services import UserService
-from .api.views import CreateUserView
+from .rest.views import CreateUserView
 
 
 class UserTestCase(TestCase):
@@ -15,7 +15,7 @@ class UserTestCase(TestCase):
         UserService.get_user_by_username('dimitar.popovski')
 
     def test_user_creation_view(self):
-        request = self.factory.post('/api/users/create', data={
+        request = self.factory.post('/rest/users/create', data={
             'username': 'jovanovska.elena',
             'password': 'password',
         })
