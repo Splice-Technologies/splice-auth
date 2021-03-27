@@ -10,11 +10,11 @@ from django.utils.html import strip_tags
 from rest_framework.exceptions import PermissionDenied
 
 from .models import User, Email
-from .utils import UserUtils
-from .conf import UserConf
+from .utils import UsersUtils
+from .conf import UsersConf
 
 
-class UserService(object):
+class UsersService(object):
     @staticmethod
     def send_user_confirmation_email(email: str, code: str):
         email_context = {'title': 'User Confirmation', 'code': code}
@@ -32,7 +32,7 @@ class UserService(object):
     def create_user(username: str, email: str, password: str) -> settings.AUTH_USER_MODEL:
         user = User.objects.create_user(username, email, password, is_active=False)
 
-        UserService.send_user_confirmation_email(user.email, user.confirmation_code)
+        UsersService.send_user_confirmation_email(user.email, user.confirmation_code)
 
         return user
 
@@ -55,9 +55,9 @@ class UserService(object):
     @staticmethod
     def reset_password(user: User) -> None:
         now = datetime.datetime.now()
-        expiration = datetime.timedelta(hours=UserConf.reset_code_expiration)
+        expiration = datetime.timedelta(hours=UsersConf.reset_code_expiration)
 
-        user.password_reset_code = UserUtils.generate_uuid4()
+        user.password_reset_code = UsersUtils.generate_uuid4()
         user.password_reset_expiration = now + expiration
         user.save()
 
@@ -99,9 +99,9 @@ class UserService(object):
     @staticmethod
     def reset_email(user: User) -> None:
         now = datetime.datetime.now()
-        expiration = datetime.timedelta(hours=UserConf.reset_code_expiration)
+        expiration = datetime.timedelta(hours=UsersConf.reset_code_expiration)
 
-        user.email_reset_code = UserUtils.generate_uuid4()
+        user.email_reset_code = UsersUtils.generate_uuid4()
         user.email_reset_expiration = now + expiration
         user.save()
 
@@ -124,10 +124,10 @@ class UserService(object):
             raise PermissionDenied()
 
         user.email = email
-        user.confirmation_code = UserUtils.generate_uuid4()
+        user.confirmation_code = UsersUtils.generate_uuid4()
         user.is_active = False
         user.save()
 
-        UserService.send_user_confirmation_email(user.email, user.confirmation_code)
+        UsersService.send_user_confirmation_email(user.email, user.confirmation_code)
 
         return True

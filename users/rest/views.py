@@ -9,7 +9,8 @@ from .serializers import (CreateUserSerializer,
                           ConfirmPasswordResetSerializer,
                           UpdateUserSerializer,
                           ConfirmEmailResetSerializer)
-from ..services import UserService
+from ..services import UsersService
+from ..utils import UsersUtils
 
 
 class CreateUserView(APIView):
@@ -21,7 +22,7 @@ class CreateUserView(APIView):
             password = serializer.validated_data.get('password')
             email = serializer.validated_data.get('email')
 
-            user = UserService.create_user(username, email, password)
+            user = UsersService.create_user(username, email, password)
             user_serializer = UserSerializer(instance=user)
 
             return Response(user_serializer.data, status=status.HTTP_201_CREATED)
@@ -33,18 +34,18 @@ class ConfirmUserView(APIView):
 
         if serializer.is_valid(raise_exception=True):
             confirmation_code = serializer.validated_data.get('confirmation_code')
-            confirmation = UserService.confirm_user(confirmation_code)
+            confirmation = UsersService.confirm_user(confirmation_code)
 
-            return Response(confirmation, status=status.HTTP_200_OK)
+            return UsersUtils.generate_message_response('Your user was successfully activated.', success=confirmation)
 
 
 class ResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        UserService.reset_password(request.user)
+        UsersService.reset_password(request.user)
 
-        return Response({'message': 'Password reset code was sent to your email.'}, status=status.HTTP_200_OK)
+        return UsersUtils.generate_message_response('Password reset code was sent to your email.')
 
 
 class ConfirmPasswordResetView(APIView):
@@ -56,9 +57,9 @@ class ConfirmPasswordResetView(APIView):
         if serializer.is_valid(raise_exception=True):
             password = serializer.validated_data.get('password')
             password_reset_code = serializer.validated_data.get('password_reset_code')
-            confirmation = UserService.confirm_password_reset(request.user, password, password_reset_code)
+            confirmation = UsersService.confirm_password_reset(request.user, password, password_reset_code)
 
-            return Response(confirmation, status=status.HTTP_200_OK)
+            return UsersUtils.generate_message_response('Your password was successfully changed.', success=confirmation)
 
 
 class UpdateUserView(APIView):
@@ -72,7 +73,7 @@ class UpdateUserView(APIView):
             first_name = serializer.validated_data.get('first_name', request.user.first_name)
             last_name = serializer.validated_data.get('last_name', request.user.last_name)
 
-            user = UserService.update_user(request.user, username, first_name, last_name)
+            user = UsersService.update_user(request.user, username, first_name, last_name)
             user_serializer = UserSerializer(instance=user)
 
             return Response(user_serializer.data, status=status.HTTP_200_OK)
@@ -82,9 +83,9 @@ class ResetEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        UserService.reset_email(request.user)
+        UsersService.reset_email(request.user)
 
-        return Response({'message': 'Email reset code was sent to your email.'}, status=status.HTTP_200_OK)
+        return UsersUtils.generate_message_response('Email reset code was sent to your email.')
 
 
 class ConfirmEmailResetView(APIView):
@@ -96,7 +97,7 @@ class ConfirmEmailResetView(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.validated_data.get('email')
             email_reset_code = serializer.validated_data.get('email_reset_code')
-            confirmation = UserService.confirm_email_reset(email, email_reset_code)
+            confirmation = UsersService.confirm_email_reset(email, email_reset_code)
 
-            return Response({'success': confirmation, 'message': 'User confirmation code was sent to your email'},
-                            status=status.HTTP_200_OK)
+            return UsersUtils.generate_message_response('User confirmation code was sent to your email.',
+                                                        success=confirmation)

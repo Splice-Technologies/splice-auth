@@ -1,24 +1,9 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 
-from .services import UserService
-from .rest.views import CreateUserView
+from .utils import UsersUtils
 
 
 class UserTestCase(TestCase):
-    def setUp(self) -> None:
-        self.factory = RequestFactory()
-
-    # noinspection PyMethodMayBeStatic
-    def test_user_creation(self):
-        UserService.create_user('dimitar.popovski', 'email@gmail.com', 'password')
-        UserService.create_user('minotaur.vampire', 'password', 'minotaur.vampire@splice.com')
-        UserService.get_user_by_username('dimitar.popovski')
-
-    def test_user_creation_view(self):
-        request = self.factory.post('/rest/users/create', data={
-            'username': 'jovanovska.elena',
-            'password': 'password',
-        })
-        response = CreateUserView.as_view()(request)
-
-        self.assertEqual(response.status_code, 201)
+    def test_message_response_generator(self):
+        response = UsersUtils.generate_message_response('Testing message', success=True)
+        print(response.data['success'])

@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 
-from .utils import UserUtils
+from .utils import UsersUtils
 
 
 class User(AbstractUser):
@@ -13,8 +13,10 @@ class User(AbstractUser):
         verbose_name = 'User'
 
     confirmation_code = models.CharField(max_length=36, blank=False, null=False)
+
     password_reset_code = models.CharField(max_length=36, blank=False, null=True)
     password_reset_expiration = models.DateTimeField(blank=True, null=True)
+
     email_reset_code = models.CharField(max_length=36, blank=False, null=True)
     email_reset_expiration = models.DateTimeField(blank=True, null=True)
 
@@ -35,7 +37,7 @@ class Email(models.Model):
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def set_confirmation_code(sender, instance=None, created=False, **kwargs):
     if created:
-        instance.confirmation_code = UserUtils.generate_uuid4()
+        instance.confirmation_code = UsersUtils.generate_uuid4()
         instance.save()
 
 

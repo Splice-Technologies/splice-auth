@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from .services import UserService
+from .services import UsersService
 
 
 class ConfirmUserTemplateView(TemplateView):
@@ -8,6 +8,6 @@ class ConfirmUserTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         confirmation_code = self.request.GET.get('confirmation_code', '')
-        confirmation = UserService.confirm_user(confirmation_code)
+        confirmation = UsersService.confirm_user(confirmation_code)
 
         return {'success': confirmation, 'username': 'my friend'}
