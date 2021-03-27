@@ -9,6 +9,7 @@ psycopg2 = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 pytz = "*"
+django-silk = "*"
 
 [dev-packages]
 
