@@ -4,7 +4,7 @@ from .services import UserService
 
 
 class ConfirmUserTemplateView(TemplateView):
-    template_name = 'users/confirmed_user.html'
+    template_name = 'users/public/user_confirmed.html'
 
     def get_context_data(self, **kwargs):
         confirmation_code = self.request.GET.get('confirmation_code', '')

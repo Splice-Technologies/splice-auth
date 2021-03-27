@@ -18,7 +18,7 @@ class UserService(object):
     @staticmethod
     def send_user_confirmation_email(email: str, code: str):
         email_context = {'title': 'User Confirmation', 'code': code}
-        email_html = render_to_string('users/confirm_user.html', email_context)
+        email_html = render_to_string('users/mail/confirm_user.html', email_context)
         email_text = strip_tags(email_html)
 
         email = EmailMultiAlternatives('Splice Technologies// Auth - User Confirmation',
@@ -62,7 +62,7 @@ class UserService(object):
         user.save()
 
         email_context = {'title': 'Password Reset', 'code': user.password_reset_code}
-        email_html = render_to_string('users/confirm_password_reset.html', email_context)
+        email_html = render_to_string('users/mail/reset_password.html', email_context)
         email_text = strip_tags(email_html)
 
         email = EmailMultiAlternatives('Splice Technologies// Auth - Password Reset',
@@ -106,7 +106,7 @@ class UserService(object):
         user.save()
 
         email_context = {'title': 'Email Reset', 'code': user.email_reset_code}
-        email_html = render_to_string('users/confirm_email_reset.html', email_context)
+        email_html = render_to_string('users/mail/reset_email.html', email_context)
         email_text = strip_tags(email_html)
 
         email = EmailMultiAlternatives('Splice Technologies// Auth - Email Reset',

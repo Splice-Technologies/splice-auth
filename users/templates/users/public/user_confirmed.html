@@ -1,0 +1,12 @@
+{% extends 'users/public/layout.html' %}
+
+{% block content %}
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        <h4 class="alert-heading">Congratulations!</h4>
+        <p>You have successfully activated your account, <b>{{ username }}</b>!</p>
+        <hr>
+        <p class="mb-0">You can log in now and continue with your activities as an authenticated user!
+            Sayonara, <b>{{ username }}</b>!</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endblock %}
