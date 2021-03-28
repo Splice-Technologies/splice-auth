@@ -17,8 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Splice Technologies Auth API')
 
 urlpatterns = [
+    path('', schema_view),
     path('admin/', admin.site.urls),
     path('silk/', include('silk.urls', namespace='silk')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

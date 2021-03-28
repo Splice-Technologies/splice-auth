@@ -19,7 +19,6 @@ from auth import conf
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -30,7 +29,6 @@ SECRET_KEY = 'yfmd$2gfdci$i$+d710d9+kp^%-f5-82wac6-1)1_zrc_x&1ss'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -46,6 +44,7 @@ INSTALLED_APPS = [
     # Third Party Apps
     'rest_framework',
     'silk',
+    'rest_framework_swagger',
 
     # Project Apps
     'users',
@@ -76,6 +75,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'staticfiles': 'django.templatetags.static',
+            }
         },
     },
 ]
@@ -84,6 +86,7 @@ WSGI_APPLICATION = 'auth.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
 
+LOGIN_URL = '/admin/login/'
 
 # Django Rest Framework definitions
 # https://www.django-rest-framework.org/
@@ -91,13 +94,13 @@ AUTH_USER_MODEL = 'users.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 ACCESS_TOKEN_LIFETIME = datetime.timedelta(hours=1)
 
 REFRESH_TOKEN_LIFETIME = datetime.timedelta(hours=2)
-
 
 # Django Mail Server definitions
 # https://docs.djangoproject.com/en/3.1/topics/email/
@@ -110,7 +113,6 @@ EMAIL_HOST_USER = conf.mail['user']
 EMAIL_HOST_PASSWORD = conf.mail['password']
 EMAIL_USE_TLS = conf.mail['tls']
 EMAIL_USE_SSL = conf.mail['ssl']
-
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -125,7 +127,6 @@ DATABASES = {
         'PORT': conf.database['port'],
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -145,7 +146,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
@@ -158,7 +158,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

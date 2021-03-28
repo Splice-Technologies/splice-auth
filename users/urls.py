@@ -27,5 +27,5 @@ urlpatterns = [
     path('reset_email/', ResetEmailView.as_view(), name='reset_email'),
     path('reset_email/confirm/', ConfirmEmailResetView.as_view(), name='confirm_email_reset'),
     path('delete/', DeleteUserView.as_view(), name='delete_user'),
-    path('delete/confirm/', ConfirmUserDeleteView.as_view(), name='confirm_user_delete')
+    path('delete/confirm/', ConfirmUserDeleteView.as_view(), name='confirm_user_delete'),
 ]
