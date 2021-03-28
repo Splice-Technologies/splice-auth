@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 
 from .serializers import (CreateUserSerializer,
@@ -14,7 +15,7 @@ from ..utils import UsersUtils
 
 
 class CreateUserView(APIView):
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         serializer = CreateUserSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -29,7 +30,7 @@ class CreateUserView(APIView):
 
 
 class ConfirmUserView(APIView):
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         serializer = ConfirmUserSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -42,7 +43,7 @@ class ConfirmUserView(APIView):
 class ResetPasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         UsersService.reset_password(request.user)
 
         return UsersUtils.generate_message_response('Password reset code was sent to your email.')
@@ -51,7 +52,7 @@ class ResetPasswordView(APIView):
 class ConfirmPasswordResetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         serializer = ConfirmPasswordResetSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):
@@ -65,7 +66,7 @@ class ConfirmPasswordResetView(APIView):
 class UpdateUserView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def put(self, request):
+    def put(self, request: Request) -> Response:
         serializer = UpdateUserSerializer(data=request.data, instance=request.user, partial=True)
 
         if serializer.is_valid(raise_exception=True):
@@ -82,7 +83,7 @@ class UpdateUserView(APIView):
 class ResetEmailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         UsersService.reset_email(request.user)
 
         return UsersUtils.generate_message_response('Email reset code was sent to your email.')
@@ -91,7 +92,7 @@ class ResetEmailView(APIView):
 class ConfirmEmailResetView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         serializer = ConfirmEmailResetSerializer(data=request.data)
 
         if serializer.is_valid(raise_exception=True):

@@ -6,7 +6,7 @@ from rest_framework import status
 
 class UsersUtils(object):
     @staticmethod
-    def generate_uuid4():
+    def generate_uuid4() -> str:
         return uuid.uuid4().hex
 
     @staticmethod
