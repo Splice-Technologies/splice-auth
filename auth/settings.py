@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # Third Party Apps
     'rest_framework',
     'silk',
-    'rest_framework_swagger',
+    'drf_yasg',
 
     # Project Apps
     'users',
@@ -85,8 +85,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'auth.wsgi.application'
 
 AUTH_USER_MODEL = 'users.User'
-
-LOGIN_URL = '/admin/login/'
 
 # Django Rest Framework definitions
 # https://www.django-rest-framework.org/
