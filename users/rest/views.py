@@ -4,14 +4,43 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import (CreateUserSerializer,
+from .serializers import (PublicUserSerializer,
+                          CreateUserSerializer,
+                          SelfUserSerializer,
                           UserSerializer,
                           ConfirmUserSerializer,
                           ConfirmPasswordResetSerializer,
                           UpdateUserSerializer,
-                          ConfirmEmailResetSerializer)
+                          ConfirmEmailResetSerializer,
+                          ConfirmUserDeleteSerializer)
 from ..services import UsersService
 from ..utils import UsersUtils
+
+
+class ListUserView(APIView):
+    def get(self, request: Request) -> Response:
+        users = UsersService.list_users()
+        serializer = PublicUserSerializer(instance=users, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DetailUserView(APIView):
+    def get(self, request: Request, pk: int) -> Response:
+        user = UsersService.get_user(pk)
+        serializer = PublicUserSerializer(instance=user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SelfUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        user = request.user
+        serializer = SelfUserSerializer(instance=user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CreateUserView(APIView):
@@ -98,7 +127,31 @@ class ConfirmEmailResetView(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.validated_data.get('email')
             email_reset_code = serializer.validated_data.get('email_reset_code')
-            confirmation = UsersService.confirm_email_reset(email, email_reset_code)
+            confirmation = UsersService.confirm_email_reset(request.user, email, email_reset_code)
 
             return UsersUtils.generate_message_response('User confirmation code was sent to your email.',
                                                         success=confirmation)
+
+
+class DeleteUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        UsersService.delete_user(request.user)
+
+        return UsersUtils.generate_message_response('User delete code was sent to your email.')
+
+
+class ConfirmUserDeleteView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = ConfirmUserDeleteSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            user_delete_code = serializer.validated_data.get('user_delete_code')
+            confirmation = UsersService.confirm_user_delete(request.user, user_delete_code)
+
+            return Response(confirmation, status=status.HTTP_204_NO_CONTENT)
+
+

@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -15,6 +16,14 @@ from .conf import UsersConf
 
 
 class UsersService(object):
+    @staticmethod
+    def list_users() -> List[settings.AUTH_USER_MODEL]:
+        return User.objects.all()
+
+    @staticmethod
+    def get_user(pk: int) -> settings.AUTH_USER_MODEL:
+        return get_object_or_404(User, pk=pk)
+
     @staticmethod
     def send_user_confirmation_email(email: str, code: str):
         email_context = {'title': 'User Confirmation', 'code': code}
@@ -117,8 +126,11 @@ class UsersService(object):
         email.send(fail_silently=False)
 
     @staticmethod
-    def confirm_email_reset(email: str, email_reset_code: str) -> bool:
+    def confirm_email_reset(request_user: User, email: str, email_reset_code: str) -> bool:
         user = get_object_or_404(User, email_reset_code=email_reset_code)
+
+        if request_user != user:
+            raise PermissionDenied()
 
         if user.email_reset_expiration < timezone.now():
             raise PermissionDenied()
@@ -129,5 +141,39 @@ class UsersService(object):
         user.save()
 
         UsersService.send_user_confirmation_email(user.email, user.confirmation_code)
+
+        return True
+
+    @staticmethod
+    def delete_user(user: User) -> None:
+        now = datetime.datetime.now()
+        expiration = datetime.timedelta(hours=UsersConf.reset_code_expiration)
+
+        user.user_delete_code = UsersUtils.generate_uuid4()
+        user.user_delete_expiration = now + expiration
+        user.save()
+
+        email_context = {'title': 'User Deletion', 'code': user.user_delete_code}
+        email_html = render_to_string('users/mail/delete_user.html', email_context)
+        email_text = strip_tags(email_html)
+
+        email = EmailMultiAlternatives('Splice Technologies// Auth - User Deletion',
+                                       email_text,
+                                       'noreply@splice.com',
+                                       [user.email])
+        email.attach_alternative(email_html, 'text/html')
+        email.send(fail_silently=False)
+
+    @staticmethod
+    def confirm_user_delete(request_user: User, user_delete_code: str) -> bool:
+        user = get_object_or_404(User, user_delete_code=user_delete_code)
+
+        if request_user != user:
+            raise PermissionDenied()
+
+        if user.user_delete_expiration < timezone.now():
+            raise PermissionDenied()
+
+        user.delete()
 
         return True

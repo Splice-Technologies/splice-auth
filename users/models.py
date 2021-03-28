@@ -20,6 +20,9 @@ class User(AbstractUser):
     email_reset_code = models.CharField(max_length=36, blank=False, null=True)
     email_reset_expiration = models.DateTimeField(blank=True, null=True)
 
+    user_delete_code = models.CharField(max_length=36, blank=False, null=True)
+    user_delete_expiration = models.DateTimeField(blank=True, null=True)
+
 
 class Email(models.Model):
     class Meta:
